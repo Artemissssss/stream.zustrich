@@ -1,14 +1,15 @@
 {
     "name": "zoom-clone-2.0",
     "version": "1.0.0",
-    "description": "",
+    "description": "Zoom Clone Application",
     "main": "server.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node server.js"
+        "start": "node server.js",
+        "build": "npm install"
     },
     "keywords": [],
-    "author": "",
+    "author": "Your Name",
     "license": "ISC",
     "dependencies": {
         "ejs": "^3.1.8",
@@ -18,7 +19,7 @@
         "socket.io": "^2.4.1",
         "uuid": "^8.3.2"
     },
-"engines": {
-  "node": ">=16"
-}
+    "engines": {
+        "node": ">=16"
+    }
 }
