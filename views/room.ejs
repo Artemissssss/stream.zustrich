@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ваша зустріч</title>
+    <link rel="icon" type="image/x-icon" href="https://artemissssss.github.io/-------------------/favicon.svg">
+    <link rel="stylesheet" href="/public/styles.css">
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.3.1/peerjs.min.js.map"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+    </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script>
+        const myname = "<%= Myname %>"
+        const roomId = "<%= roomid %>"
+    </script>
+</head>
+
+<body>
+    <video autoplay style="display: none;" muted></video>
+    <a id="download" style="display: none;"></a>
+    <div class="need">
+
+        <div class="need-2" id="need-2">
+            <div class="about-prog" id="about-prog">
+                <h2 class="name-comp">Стрім.Зустріч</h2>
+                <h2 id="id-conference"></h2>
+            </div>
+            <div class="timer-sect">
+                <div class="timer-text">
+                    <p class="timer" id="timer"></p>
+                </div>
+                <div class="timer-bar">
+                    <div class="bar" id="bar"></div>
+                    <div class="line"></div>
+                </div>
+            </div>
+            <div class="mainclone" id="mainclone">
+                <div id="pinned">
+                    <!-- <video id="pinVideo"></video> -->
+                </div>
+                <div class="main_left">
+                    <div class="main_videos" id="main_videos">
+                        <div id="video-grids">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="main_right" id="chat">
+            <div class="main_right_header">
+                <h6>Чат</h6>
+            </div>
+            <div class="main__chat_window" id="main__chat_window">
+                <ul class="messages" id="messageadd">
+
+                </ul>
+
+            </div>
+            <div>
+                <div class="main__message_container">
+                    <input type="text" id="chat_message" onkeydown="sendmessage(this)"
+                        placeholder="Ваше повідомлення" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="main_controls">
+        <div class="main_controls_block">
+            <div class="buttons-cont">
+                <div class="main_controls_button" id="mic" onclick="muteUnmute()">
+                    <i class="fas fa-microphone-slash"></i>
+                </div>
+
+                <div class="main_controls_button" id="video" onclick="VideomuteUnmute()">
+                    <i class="fas fa-video-slash"></i>
+                </div>
+
+
+                <div class="main_controls_button" id="chat-1" onclick="showchat()">
+                    <i class="fas fa-comment-alt"></i>
+                </div>
+                <div class="main_controls_button" id="emotes" onclick="EmotesChanger()">
+                    <div class="emotes-list" id="emotes-list">
+                        <i class="chs chs-emotes" id="happy"></i>
+                        <i class="chs chs-emotes" id="good"></i>
+                        <i class="chs chs-emotes" id="neutral"></i>
+                        <i class="chs chs-emotes" id="sad"></i>
+                        <i class="chs chs-emotes" id="die"></i>
+                    </div>
+                    <i class="fas fa-emotes-slash"></i>
+                </div>
+
+                <div class="main_controls_button" id="recorder" onclick="Recorder()">
+                    <div class="recorser-list" id="recorder-list">
+                        <i class="chs chs-recorder" id="screenRecorder" onclick="recordScreen()">Запис екрану</i>
+                        <i class="chs chs-recorder" id="soundRecorder" onclick="recordAudio()">Запис звуку</i>
+                        <i class="chs chs-recorder" id="screenshot">Знімок екрана</i>
+                    </div>
+                    <i class="fas fa-recorder-slash"></i>
+                </div>
+            </div>
+            <div class="main_controls_button leave_red">
+                <span class="leave_meeting"><a id="leave-btn" href="/">Вийти</a></span>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    </div>
+    <div class="form" id="form">
+        <form class="unknown-form" action="/joinold">
+            <h2 class="name">Зустріч</h2>
+            <input type="text" class="name-form-2" placeholder="Ваше ім'я" name="name" required />
+            <input type="text" class="surname-form-2" placeholder="Ваше прізвище" name="surname" required />
+
+            <input type="text" id="id-meet" class="meet-form" placeholder="ID зустрічі" name="meeting_id" readonly />
+            <button class="host-form">Приєднатися</button>
+        </form>
+    </div>
+    </div>
+    <div id="back"></div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-app.js";
+        import { getDatabase, set, ref ,push, child, onValue, remove} from
+        "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
+        
+        const firebaseConfig = {
+  apiKey: "AIzaSyCkVb4Sci_kZUdGouDPo1eY3HCHLOWfzqY",
+  authDomain: "zustrich-be18b.firebaseapp.com",
+  databaseURL: "https://zustrich-be18b-default-rtdb.firebaseio.com",
+  projectId: "zustrich-be18b",
+  storageBucket: "zustrich-be18b.appspot.com",
+  messagingSenderId: "125274425353",
+  appId: "1:125274425353:web:6f38bd6892f88805ee10d8",
+  measurementId: "G-4MH57WVHBD"
+};
+      const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const starCountRef = ref(database, 'rooms/');
+    let fy = 0;
+    let time;
+    let idUser;
+    onValue(starCountRef, (snapshot) => {
+
+        snapshot.forEach(childSnapshot => {
+            if (childSnapshot.key == roomId && fy !== 1) {
+                fy = 1;
+                idUser = childSnapshot.val().members.length;
+                time = childSnapshot.val().time;
+                let newUs = childSnapshot.val().members
+                newUs.unshift({id:idUser, name:myname, surname:decodeURI(window.location.href.split("surname=")[1].split("&")[0])})
+                set(ref(database, "rooms/" + roomId), {
+                    time: childSnapshot.val().time,
+                    members:newUs
+                });
+
+                let sumSec = () =>{
+                    if(time.split("-").join("")[0] != `${new Date().getHours()}:${new Date().getMinutes()}`){
+                        console.log(`${new Date().getHours()}:${new Date().getMinutes()}-${time.split("-")[1]}`)
+                        time = `${new Date().getHours()}:${new Date().getMinutes()}-${time.split("-")[1]}`
+                    }
+                    return (((parseInt(time.split("-")[1].split(":")[0])*3600)+(parseInt(time.split(":")[2])*60))-((parseInt(time.split(":")[0])*3600)+(parseInt(time.split("-")[0].split(":")[1])*60)));
+                }
+             document.getElementById("timer").textContent = `Очікуваний кінець зустрічі о ${time.split("-")[1]}`;
+            let widthCount = 100;
+            let munisNum = 100/sumSec();
+            let interval;
+            let oi = 0;
+            interval = setInterval(() => {
+                widthCount = widthCount-munisNum;
+                document.getElementById("bar").style.width = `${widthCount}%`
+                oi+=1;
+                console.log(oi)
+                if(oi==sumSec()){
+                    document.getElementById("bar").style.width = `100%`;
+                    document.getElementById("timer").style.color = "#FB1717";
+                    document.getElementById("bar").style.background = "#DB1C1C";
+                    clearInterval(interval);
+                }
+            },1000);
+            
+            }
+        });
+        if (fy == 0) {
+            fy = 1;
+            time = () => {if(window.location.href.split("time-choise=on&")[1].split("=")[0] =="from"){return window.location.href.split("time-choise=on&")[1].split("=")[1].split("&")[0].split("%3A").join(":")+"-"+window.location.href.split("time-choise=on&")[1].split("=")[2].split("&")[0].split("%3A").join(":")}else{if(decodeURI(window.location.href.split("time-choise=on&")[1].split("=")[2]) == "хв"){return parseInt(window.location.href.split("time-choise=on&")[1].split("=")[1].split("&")[0])*60;}else{return parseInt(window.location.href.split("time-choise=on&")[1].split("=")[1].split("&")[0])*3600;}}};
+            idUser = 0;
+            set(ref(database, "rooms/" + roomId), {
+                    time: time(),
+                    members:[{id:0,name:myname,surname:decodeURI(window.location.href.split("surname=")[1].split("&")[0])}]
+            });
+            if(window.location.href.split("time-choise=on&")[1].split("=")[0] =="from"){
+            let sumSec = () => {
+                if(time())
+                return (((parseInt(time().split("-")[1].split(":")[0])*3600)+(parseInt(time().split(":")[2])*60))-((parseInt(time().split(":")[0])*3600)+(parseInt(time().split("-")[0].split(":")[1])*60)));
+            }
+            document.getElementById("timer").textContent = `Очікуваний кінець зустрічі о ${time().split("-")[1]}`;
+            let widthCount = 100;
+            let munisNum = 100/sumSec();
+            let interval;
+            let oi = 0;
+            interval = setInterval(() => {
+                widthCount = widthCount-munisNum;
+                document.getElementById("bar").style.width = `${widthCount}%`
+                oi+=1;
+                if(oi==sumSec()){
+                    document.getElementById("bar").style.width = `100%`;
+                    document.getElementById("timer").style.color = "#FB1717";
+                    document.getElementById("bar").style.background = "#DB1C1C";
+                    clearInterval(interval);
+                }
+            },1000);
+            }
+        }
+    });
+        </script>
+    <script type="text/javascript" src="/public/main.js"></script>
+</body>
+
+</html>

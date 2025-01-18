@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Зустріч</title>
+    <link rel="stylesheet" href="public/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="https://artemissssss.github.io/-------------------/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="Name-Page">
+        <div class="form">
+            <form class="known-form" action="/join">
+                <ul class="form-list">
+                    <li class="form-item">
+
+                        <h1>Стрім.Зустріч</h1>
+                        <input type="text" class="name-form" placeholder="Ваше ім'я" name="name" required />
+                        <input type="text" class="surname-form" placeholder="Ваше прізвище" name="surname" required />
+                    </li>
+                    <li class="form-item">
+
+                        <button class="host-form">Почати стрім</button>
+                        <p><a class="join-form" href="javascript:show()">Приєднатися</a></p>
+                    </li>
+                </ul>
+            </form>
+
+            <form class="unknown-form" action="/joinold">
+                <h2 class="name">Стрім.Зустріч</h2>
+                <input type="text" class="name-form-2" placeholder="Ваше ім'я" name="name" required />
+                <input type="text" class="surname-form-2" placeholder="Ваше прізвище" name="surname" required />
+                <input type="text" class="meet-form" placeholder="ID стріму" name="meeting_id" required />
+                <button class="host-form">Приєднатися</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function show() {
+            if (window.height < 649 && window.width < 1200) {
+                $('form').animate({
+                    height: "toggle",
+                    opacity: "toggle",
+                    height: "306px"
+                }, "slow")
+                $('.form').animate({
+                    height: "306px"
+                }, "slow")
+            } else {
+                $('form').animate({
+                    height: "toggle",
+                    opacity: "toggle",
+                    height: "412px"
+                }, "slow")
+                $('.form').animate({
+                    height: "412px"
+                }, "slow")
+            }
+        }
+    </script>
+</body>
+
+</html>
