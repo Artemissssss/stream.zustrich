@@ -140,7 +140,11 @@ const socket = io('');
         const video = document.createElement("video");
         
         call.on("stream", (userVideoStream) => {
-            addVideoStream(video, userVideoStream, username);
+            if(username.includes("(Screen)")){
+                addScreenStream(video, userVideoStream, username);
+            }else{
+                addVideoStream(video, userVideoStream, username);
+            }
         });
         
         call.on("close", () => {
