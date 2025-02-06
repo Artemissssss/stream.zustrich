@@ -53,13 +53,13 @@ a:active {
 .name-of-user {
     position: absolute;
     left: 50%;
-    bottom: 10px;
+    bottom: 5%;
     transform: translateX(-50%);
     color: white !important;
     font-family: 'Comfortaa', sans-serif !important;
     font-style: normal !important;
     font-weight: 700 !important;
-    max-width: 230px;
+    max-width: 100%;
     overflow: scroll;
     z-index: 10;
 }
@@ -79,9 +79,18 @@ video {
     max-height: 150px;
     margin: 20px;
 }
-
+.screenShare{
+    display: block;
+    flex: 1;
+    object-fit: cover;
+    background-color: #C4C4C4;
+    border-radius: 25px;
+    max-width: 828px;
+    max-height: 540px;
+    margin: 20px;
+}
 .mainclone {
-    height: 375px;
+    height: 70vh;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -100,7 +109,7 @@ video {
     flex: 0.2;
     flex-direction: column;
     width: 257px;
-    height: 485px;
+    min-height: 100%;
     background: #D1D1D1;
     border-radius: 42px;
     margin-top: 23px;
@@ -133,10 +142,10 @@ video {
     display: flex;
     /* flex-direction: row; */
     align-items: center;
-    margin-top: 70px;
+    margin-top: 20px;
     background: #D1D1D1;
     border-radius: 39px;
-    padding: 0 36px 0 36px;
+    padding: 0 20px 0 36px;
     color: white;
     justify-content: space-between;
 }
@@ -155,7 +164,8 @@ video {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;
+    padding: 20px;
+    padding-top: 0;
     height: 375px;
 }
 
@@ -743,7 +753,7 @@ h1,
 }
 
 #pinned {
-    height: 350px;
+    height: 50vh;
     width: 100%;
     overflow: scroll;
     display: none;
@@ -833,4 +843,21 @@ h1,
     left: 0;
     transform: translateY(-50%);
     z-index: 2;
+}
+
+#screen-share-btn {
+    width: 64px;
+    height: 64px;
+    background: url('https://artemissssss.github.io/-------------------/img/sharewhite.png');
+    background-repeat: no-repeat !important;
+    background-size: 64px;
+    transition: 0.5s;
+}
+#screen-share-btn.fas {
+    width: 64px;
+    height: 64px;
+    background: url('https://artemissssss.github.io/-------------------/img/share.png');
+    background-repeat: no-repeat !important;
+    background-size: 64px;
+    transition: 0.5s;
 }

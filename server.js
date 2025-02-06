@@ -24,7 +24,7 @@ app.get("/join", (req, res) => {
     res.redirect(
         url.format({
             pathname: `/join/${uuidv4()}`,
-            query: req.query,
+            query: {...req.query,op:true},
         })
     );
 });
@@ -33,7 +33,7 @@ app.get("/joinold", (req, res) => {
     res.redirect(
         url.format({
             pathname: req.query.meeting_id,
-            query: req.query,
+            query: {...req.query,op:false},
         })
     );
 });
@@ -41,15 +41,15 @@ app.get("/api/sleep", (req, res) => {
     res.status(200).json({ok:true})
 });
 app.get("/join/:rooms", (req, res) => {
-    res.render("room", { roomid: req.params.rooms, Myname: req.query.name });
+    res.render("room", { roomid: req.params.rooms, Myname: req.query.name, op: req.query.op });
 });
 app.get("/join/:rooms", (req, res) => {
-    res.render("room", { roomid: req.params.rooms, Myname: req.query.name });
+    res.render("room", { roomid: req.params.rooms, Myname: req.query.name, op: req.query.op });
 });
 io.on("connection", (socket) => {
     socket.on("join-room", (roomId, id, myname) => {
         socket.join(roomId);
-        socket.to(roomId).broadcast.emit("user-connected", id, myname);
+        socket.to(roomId).emit("user-connected", id, myname);
 
         socket.on("messagesend", (message) => {
             console.log(message);
@@ -58,11 +58,11 @@ io.on("connection", (socket) => {
 
         socket.on("tellName", (myname) => {
             console.log(myname);
-            socket.to(roomId).broadcast.emit("AddName", myname);
+            socket.to(roomId).emit("AddName", myname);
         });
 
         socket.on("disconnect", () => {
-            socket.to(roomId).broadcast.emit("user-disconnected", id);
+            socket.to(roomId).emit("user-disconnected", id);
         });
     });
 });

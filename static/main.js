@@ -3,10 +3,12 @@ if (window.location.href == "https://zustrich.artemissssss.de/join/" + roomId ||
     document.getElementById("back").style.display = "inline-block"
     document.getElementById("id-meet").value = "/join/" + roomId;
 }
-const socket = io('wss://zustrich.artemissssss.de', {
-    transports: ['websocket']
-  });    const main__chat__window = document.getElementById("main__chat_window");
+console.log(op)
+const socket = io('/');
+    const main__chat__window = document.getElementById("main__chat_window");
     const videoGrids = document.getElementById("video-grids");
+    const videoPin = document.getElementById("pinned");
+
     const myVideo = document.createElement("video");
     const chat = document.getElementById("chat");
     OtherUsername = "";
@@ -18,7 +20,16 @@ const socket = io('wss://zustrich.artemissssss.de', {
             $("#getCodeModal").modal("show");
         });
     };
-
+    function toggleControls(op) {
+        const micButton = document.getElementById('mic');
+        const videoButton = document.getElementById('video');
+        if (!op) {
+            micButton.style.display = 'none'; // Сховати мікрофон
+            videoButton.style.display = 'none'; // Сховати відео
+        }
+    }
+    
+    toggleControls(op);
     var peer = new Peer(undefined, {
         path: "/peerjs",
         host: "/",
@@ -30,51 +41,54 @@ const socket = io('wss://zustrich.artemissssss.de', {
         navigator.getUserMedia ||
         navigator.webkitGetUserMedia ||
         navigator.mozGetUserMedia;
+        sendmessage = (text) => {
+            if (event.key === "Enter" && text.value != "") {
+                // Only send message if not from screen share connection
+                    socket.emit("messagesend", myname + ":" + text.value);
+                    text.value = "";
+                    main__chat_window.scrollTop = main__chat_window.scrollHeight;
+                
+            }
+        };
+        let localStream = null;
 
-    sendmessage = (text) => {
-        if (event.key === "Enter" && text.value != "") {
-            socket.emit("messagesend", myname + ":" + text.value);
-            text.value = "";
-            main__chat_window.scrollTop = main__chat_window.scrollHeight;
-        }
-    };
-
-    navigator.mediaDevices
-        .getUserMedia({
-            video: true,
-            audio: true,
-        })
-        .then((stream) => {
-            myVideoStream = stream;
-            addVideoStream(myVideo, stream, myname);
-
-            socket.on("user-connected", (id, username) => {
-                connectToNewUser(id, stream, username);
-                socket.emit("tellName", myname);
+        navigator.mediaDevices
+            .getUserMedia({
+                video: op, 
+                audio: op, 
+            })
+            .then((stream) => {
+                localStream = stream;
+        
+                if (op) {
+                    myVideoStream = stream;
+                    addVideoStream(myVideo, stream, myname);
+                }
+        
+                socket.on("user-connected", (id, username) => {
+                    connectToNewUser(id, localStream, username);
+                    socket.emit("tellName", myname);
+                });
+        
+                socket.on("user-disconnected", (id) => {
+                    console.log(peers);
+                    if (peers[id]) peers[id].close();
+                });
+            })
+            .catch((err) => {
+                console.error("Failed to get local stream", err);
             });
-
-            socket.on("user-disconnected", (id) => {
-                console.log(peers);
-                if (peers[id]) peers[id].close();
+        
+        peer.on("call", (call) => {
+            // Відповідаємо на виклик з локальним потоком, навіть якщо він порожній
+            call.answer(localStream);
+        
+            const video = document.createElement("video");
+            call.on("stream", (remoteStream) => {
+                addVideoStream(video, remoteStream, OtherUsername);
             });
         });
-    peer.on("call", (call) => {
-        getUserMedia({
-                video: true,
-                audio: true
-            },
-            function (stream) {
-                call.answer(stream); // Answer the call with an A/V stream.
-                const video = document.createElement("video");
-                call.on("stream", function (remoteStream) {
-                    addVideoStream(video, remoteStream, OtherUsername);
-                });
-            },
-            function (err) {
-                console.log("Failed to get local stream", err);
-            }
-        );
-    });
+        
 
     peer.on("open", (id) => {
         socket.emit("join-room", roomId, id, myname);
@@ -106,20 +120,41 @@ const socket = io('wss://zustrich.artemissssss.de', {
                 alldivs[i].remove();
             }
         }
+        alldivs = videoPin.getElementsByTagName("div");
+        for (var i = 0; i < alldivs.length; i++) {
+            e = alldivs[i].getElementsByTagName("video").length;
+            if (e == 0) {
+                alldivs[i].remove();
+            }
+        }
+    if(!alldivs.length){
+        videoPin.style.display = "none";
+    }
     };
 
-    const connectToNewUser = (userId, streams, myname) => {
+    const connectToNewUser = (userId, streams, username) => {
         const call = peer.call(userId, streams);
         const video = document.createElement("video");
+        
         call.on("stream", (userVideoStream) => {
-            //   console.log(userVideoStream);
-            addVideoStream(video, userVideoStream, myname);
+            addVideoStream(video, userVideoStream, username);
         });
+        
         call.on("close", () => {
             video.remove();
             RemoveUnusedDivs();
         });
+        
         peers[userId] = call;
+    
+        // Share screen with new user if we're currently sharing
+        if (isScreenSharing && screenStream && screenSharePeer) {
+            try {
+                const screenCall = screenSharePeer.call(userId, screenStream);
+            } catch (err) {
+                console.error('Failed to share screen with new user:', err);
+            }
+        }
     };
 
 
@@ -181,6 +216,108 @@ const socket = io('wss://zustrich.artemissssss.de', {
         } else {
             document.getElementById("recorder-list").style.display = "none"
         }
+    }
+
+    let screenSharePeer = null;
+    let screenStream = null;
+    let isScreenSharing = false;
+    let screenVideoElement = null;
+    
+    // Updated toggle screen share function with better visibility and cleanup
+    async function toggleScreenShare() {
+        if (!isScreenSharing) {
+            try {
+                // Get screen stream
+                screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: true,
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    }
+                });
+    
+                // Create screen video element
+                screenVideoElement = document.createElement('video');
+                screenVideoElement.classList.add('screenShare');
+                screenVideoElement.setAttribute('autoplay', true);
+                screenVideoElement.setAttribute('playsinline', true);
+                
+                // Create new peer for screen sharing
+                screenSharePeer = new Peer(undefined, {
+                    path: "/peerjs",
+                    host: "/",
+                    port: "3030",
+                });
+    
+                // Handle peer open event
+                screenSharePeer.on('open', (screenId) => {
+                    socket.emit('join-room', roomId, screenId, `${myname} (Screen)`);
+                    
+                    // Add local screen preview
+                    addScreenStream(screenVideoElement, screenStream, `${myname} (Screen)`);
+                });
+    
+                // Handle incoming calls for screen share
+                screenSharePeer.on('call', (call) => {
+                    call.answer(screenStream);
+                    
+                    call.on('stream', (remoteStream) => {
+                        // Handle remote stream if needed
+                    });
+                });
+    
+                // Handle screen share stop from browser
+                screenStream.getVideoTracks()[0].onended = () => {
+                    cleanupScreenShare();
+                };
+    
+                // Update state
+                isScreenSharing = true;
+                document.getElementById('screen-share-btn').style.background = "url('https://artemissssss.github.io/-------------------/img/share.png')";
+    
+                // Connect to existing peers
+                Object.keys(peers).forEach((userId) => {
+                    const call = screenSharePeer.call(userId, screenStream);
+                });
+    
+            } catch (err) {
+                console.error('Failed to share screen:', err);
+                cleanupScreenShare();
+            }
+        } else {
+            cleanupScreenShare();
+        }
+    }
+    
+    // Improved cleanup function
+    function cleanupScreenShare() {
+        if (screenStream) {
+            screenStream.getTracks().forEach(track => {
+                track.stop();
+            });
+        }
+    
+        if (screenSharePeer) {
+            screenSharePeer.disconnect();
+            screenSharePeer.destroy();
+        }
+    
+        // Remove screen video element if it exists
+        if (screenVideoElement && screenVideoElement.parentElement) {
+            screenVideoElement.parentElement.remove();
+        }
+    
+        // Reset all variables
+        screenStream = null;
+        screenSharePeer = null;
+        screenVideoElement = null;
+        isScreenSharing = false;
+        
+        // Update button style
+        document.getElementById('screen-share-btn').style.background = "url('https://artemissssss.github.io/-------------------/img/sharewhite.png')";
+        
+        // Cleanup video grid
+        RemoveUnusedDivs();
     }
     //=====================================================================
     let shouldStop = false;
@@ -318,8 +455,32 @@ const socket = io('wss://zustrich.artemissssss.de', {
             }
         }
     };
+    const addScreenStream = (videoEl, stream, name) => {
+        videoEl.srcObject = stream;
+        videoEl.addEventListener("loadedmetadata", () => {
+            videoEl.play();
+        });
+        const h1 = document.createElement("h2");
+        const h1name = document.createTextNode(name);
+        h1.className = "name-of-user"
+        h1.appendChild(h1name);
+        const videoGrid = document.createElement("div");
+        videoGrid.classList.add("video-grid");
+        videoGrid.appendChild(h1);
+        videoPin.style.display = "flex"
+        videoPin.appendChild(videoGrid);
+        videoGrid.append(videoEl);
+        RemoveUnusedDivs();
+        let totalUsers = document.getElementsByTagName("video").length;
+        if (totalUsers > 1) {
+            for (let index = 0; index < totalUsers; index++) {
+                document.getElementsByTagName("video")[index].style.width =
+                    100 / totalUsers + "%";
+            }
+        }
+    };
     let yx = 0;
-    document.getElementById("video-grids").addEventListener("dblclick", (e) => {
+    document.getElementById("main_videos").addEventListener("dblclick", (e) => {
         if (yx == 0) {
             $(e.path[1]).appendTo("#pinned")
             e.path[1].style.transform = "scale(2.2)"
@@ -347,6 +508,5 @@ const socket = io('wss://zustrich.artemissssss.de', {
         copyToClipboard("/join/" + roomId)
     })
     document.getElementById("id-conference").addEventListener("dblclick", () => {
-        // copyToClipboard("https://artem-video.herokuapp.com/join/"+roomId)
-        copyToClipboard(`Посилання, щоб долучитися до конференції у зустрічі:\nВи можете зайти нас сайт zustrich.artemissssss.de та долучитися, за допомогою Id зустрічі /join/${roomId}.\nАбо перейдіть за посиланням https://zustrich.artemissssss.de/join/${roomId}.`)
     })
+   

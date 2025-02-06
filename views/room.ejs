@@ -31,6 +31,7 @@
     <script>
         const myname = "<%= Myname %>"
         const roomId = "<%= roomid %>"
+        const op = "<%= op %>"
     </script>
 </head>
 
@@ -44,7 +45,7 @@
                 <h2 class="name-comp">Стрім.Зустріч</h2>
                 <h2 id="id-conference"></h2>
             </div>
-            <div class="timer-sect">
+            <!-- <div class="timer-sect">
                 <div class="timer-text">
                     <p class="timer" id="timer"></p>
                 </div>
@@ -52,7 +53,7 @@
                     <div class="bar" id="bar"></div>
                     <div class="line"></div>
                 </div>
-            </div>
+            </div> -->
             <div class="mainclone" id="mainclone">
                 <div id="pinned">
                     <!-- <video id="pinVideo"></video> -->
@@ -97,7 +98,10 @@
                 <div class="main_controls_button" id="video" onclick="VideomuteUnmute()">
                     <i class="fas fa-video-slash"></i>
                 </div>
-
+<!-- Add this inside the buttons-cont div, alongside your other controls -->
+<div class="main_controls_button" id="screen-share-btn" onclick="toggleScreenShare()">
+    <i class="fas"></i>
+</div>
 
                 <div class="main_controls_button" id="chat-1" onclick="showchat()">
                     <i class="fas fa-comment-alt"></i>
