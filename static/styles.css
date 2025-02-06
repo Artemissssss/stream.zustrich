@@ -869,6 +869,10 @@ h1,
     align-items: center;
     flex-wrap: wrap;
     overflow-y: auto;
-    max-width: 828px;
-    max-height: 540px;
+    min-width: 828px;
+    min-height: 540px;
+}
+.stream>video{
+    min-width: 100%;
+    min-height: 100%;
 }
