@@ -464,7 +464,7 @@ const socket = io('');
             }
         }
     };
-    const addScreenStream = (videoEl, stream, name) => {
+     const addScreenStream = (videoEl, stream, name) => {
         videoEl.srcObject = stream;
         videoEl.addEventListener("loadedmetadata", () => {
             videoEl.play();
@@ -474,7 +474,7 @@ const socket = io('');
         h1.className = "name-of-user"
         h1.appendChild(h1name);
         const videoGrid = document.createElement("div");
-        videoGrid.classList.add("video-grid");
+        videoGrid.classList.add("stream");
         videoGrid.appendChild(h1);
         videoPin.style.display = "flex"
         videoPin.appendChild(videoGrid);
