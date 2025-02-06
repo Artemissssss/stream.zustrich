@@ -31,7 +31,7 @@ const socket = io('');
     
     toggleControls(op);
     var peer = new Peer(undefined, {
-        host: 'pleasing-powerful-lizard.ngrok-free.app',
+        host: 'stream-zustrich.onrender.com',
         port: 443,  // Важливо використовувати 443 для ngrok
         path: '/peerjs',
         secure: true,  // Вмикаємо secure для https
@@ -247,7 +247,7 @@ const socket = io('');
                 
                 // Create new peer for screen sharing
                 screenSharePeer = new Peer(undefined, {
-                    host: 'pleasing-powerful-lizard.ngrok-free.app',
+                    host: 'stream-zustrich.onrender.com',
     port: 443,  // Важливо використовувати 443 для ngrok
     path: '/peerjs',
     secure: true,  // Вмикаємо secure для https
