@@ -1,8 +1,17 @@
 const express = require("express");
-const app = express();
-const server = require("http").Server(app);
+
 const { v4: uuidv4 } = require("uuid");
-const io = require("socket.io")(server);
+const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+        credentials: true
+    },
+    transports: ['websocket', 'polling'],
+    path: '/socket.io/'  // Явно вказуємо шлях
+});
 const { ExpressPeerServer } = require("peer");
 const url = require("url");
 const peerServer = ExpressPeerServer(server, {
@@ -10,7 +19,7 @@ const peerServer = ExpressPeerServer(server, {
 });
 const path = require("path");
 const { config } = require("process");
-const PORT =process.env.PORT  || 3030
+const PORT = 3030
 //|| config.get('serverPort');
 app.set("view engine", "ejs");
 app.use("/public", express.static(path.join(__dirname, "static")));
@@ -43,9 +52,7 @@ app.get("/api/sleep", (req, res) => {
 app.get("/join/:rooms", (req, res) => {
     res.render("room", { roomid: req.params.rooms, Myname: req.query.name, op: req.query.op });
 });
-app.get("/join/:rooms", (req, res) => {
-    res.render("room", { roomid: req.params.rooms, Myname: req.query.name, op: req.query.op });
-});
+
 io.on("connection", (socket) => {
     socket.on("join-room", (roomId, id, myname) => {
         socket.join(roomId);
@@ -67,6 +74,4 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(process.env.PORT || 3030
- //   || config.get('serverPort')
-    );
+server.listen(80,'0.0.0.0');

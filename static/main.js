@@ -4,7 +4,7 @@ if (window.location.href == "https://zustrich.artemissssss.de/join/" + roomId ||
     document.getElementById("id-meet").value = "/join/" + roomId;
 }
 console.log(op)
-const socket = io('/');
+const socket = io('');
     const main__chat__window = document.getElementById("main__chat_window");
     const videoGrids = document.getElementById("video-grids");
     const videoPin = document.getElementById("pinned");
@@ -31,9 +31,12 @@ const socket = io('/');
     
     toggleControls(op);
     var peer = new Peer(undefined, {
-        path: "/peerjs",
-        host: "/",
-        port: "3030",
+        host: 'pleasing-powerful-lizard.ngrok-free.app',
+        port: 443,  // Важливо використовувати 443 для ngrok
+        path: '/peerjs',
+        secure: true,  // Вмикаємо secure для https
+        proxied: true
+        
     });
     let myVideoStream;
     const peers = {};
@@ -244,9 +247,11 @@ const socket = io('/');
                 
                 // Create new peer for screen sharing
                 screenSharePeer = new Peer(undefined, {
-                    path: "/peerjs",
-                    host: "/",
-                    port: "3030",
+                    host: 'pleasing-powerful-lizard.ngrok-free.app',
+    port: 443,  // Важливо використовувати 443 для ngrok
+    path: '/peerjs',
+    secure: true,  // Вмикаємо secure для https
+    proxied: true
                 });
     
                 // Handle peer open event
