@@ -13,23 +13,69 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <style>
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 10px auto;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-left-color: #4285f4;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-container {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #4285f4;
+            width: 0%;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
     <div class="Name-Page">
         <div class="form">
-            <form class="known-form" action="/join">
+            <form class="known-form" id="upload-form" action="/join" method="post" enctype="multipart/form-data">
                 <ul class="form-list">
                     <li class="form-item">
-
                         <h1>Стрім.Зустріч</h1>
                         <input type="text" class="name-form" placeholder="Ваше ім'я" name="name" required />
                         <input type="text" class="surname-form" placeholder="Ваше прізвище" name="surname" required />
-
+                        <div class="file-upload-container">
+                            <label for="video-upload" class="file-upload-label">Файл для офлайн стріму</label>
+                            <input type="file" id="video-upload" name="videoFile" accept="video/*" class="video-upload-input" />
+                            <span style="display: none;" id="file-selected" class="file-selected">Файл не вибрано</span>
+                        </div>
+                        
+                        <!-- Прогрес завантаження -->
+                        <div class="progress-container" id="progress-container">
+                            <div class="progress-bar" id="progress-bar"></div>
+                        </div>
                     </li>
                     <li class="form-item">
-
-                        <button class="host-form">Почати стрім</button>
+                        <button class="host-form" type="submit" id="submit-btn">Почати стрім</button>
+                        <div class="loading-indicator" id="loading-indicator">
+                            <div class="spinner"></div>
+                            <p>Завантаження відео...</p>
+                        </div>
                         <p><a class="join-form" href="javascript:show()">Приєднатися</a></p>
                     </li>
                 </ul>
@@ -66,6 +112,62 @@
                 }, "slow")
             }
         }
+
+        // Функція для відображення імені вибраного файлу
+        document.getElementById('video-upload').addEventListener('change', function() {
+            const fileName = this.files[0] ? this.files[0].name : 'Файл не вибрано';
+            document.getElementById('file-selected').textContent = fileName;
+        });
+        
+        // Функція для відображення прогресу завантаження
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            const fileInput = document.getElementById('video-upload');
+            
+            if (fileInput.files.length > 0) {
+                e.preventDefault(); // Зупиняємо стандартну відправку форми
+                
+                const formData = new FormData(this);
+                const xhr = new XMLHttpRequest();
+                
+                // Показуємо індикатор завантаження
+                document.getElementById('submit-btn').style.display = 'none';
+                document.getElementById('loading-indicator').style.display = 'block';
+                document.getElementById('progress-container').style.display = 'block';
+                
+                // Відстежуємо прогрес завантаження
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        document.getElementById('progress-bar').style.width = percentComplete + '%';
+                    }
+                });
+                
+                // Обробляємо завершення завантаження
+                xhr.addEventListener('load', function() {
+                    if (xhr.status === 200 || xhr.status === 302) {
+                        // Перехід за посиланням переадресації
+                        window.location.href = xhr.responseURL;
+                    } else {
+                        alert('Помилка при завантаженні відео. Спробуйте ще раз.');
+                        document.getElementById('submit-btn').style.display = 'block';
+                        document.getElementById('loading-indicator').style.display = 'none';
+                        document.getElementById('progress-container').style.display = 'none';
+                    }
+                });
+                
+                // Обробляємо помилки завантаження
+                xhr.addEventListener('error', function() {
+                    alert('Помилка зєднання. Спробуйте ще раз.');
+                    document.getElementById('submit-btn').style.display = 'block';
+                    document.getElementById('loading-indicator').style.display = 'none';
+                    document.getElementById('progress-container').style.display = 'none';
+                });
+                
+                // Відправляємо запит
+                xhr.open('POST', '/join');
+                xhr.send(formData);
+            }
+        });
     </script>
 </body>
 

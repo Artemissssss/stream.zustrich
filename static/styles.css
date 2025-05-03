@@ -876,3 +876,24 @@ h1,
     min-width: 100%;
     min-height: 100%;
 }
+#shared-video{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    min-width: 828px !important;
+    min-height: 540px !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+}
+
+audio::-webkit-media-controls-timeline,
+video::-webkit-media-controls-timeline {
+    display: none;
+}
+audio::-webkit-media-controls,
+video::-webkit-media-controls {
+    display: none;
+}
