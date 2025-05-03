@@ -57,7 +57,9 @@ const upload = multer({
 const peerServer = ExpressPeerServer(server, {
     path: '/peerjs', // This should match the client side path
     debug: true,
-    path: '/',
+    // port: 80, // Видалено або буде ігноруватися, оскільки PeerServer прив'язаний до основного сервера
+    // secure: window.location.protocol === 'https:', // Видалено, оскільки Render обробляє SSL
+    path: '/', // Шлях для PeerJS сервера
     allow_discovery: true,
     cors: {
         origin: '*'
@@ -65,19 +67,17 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 const { config } = require("process");
-const PORT = 80;
-//|| config.get('serverPort');
+// Використовуємо порт, наданий середовищем (Render), або 80 за замовчуванням
+const PORT = process.env.PORT || 80;
+
 app.set("view engine", "ejs");
 app.use("/public", express.static(path.join(__dirname, "static")));
-app.use("/peerjs", peerServer);
+app.use("/peerjs", peerServer); // PeerServer тепер доступний за шляхом /peerjs
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Доступ до папки з відео
 
 // Об'єкт для зберігання інформації про відео та стан відтворення для кожної кімнати
 const roomVideoStates = {};
 const playbackIntervals = {}; // Для зберігання інтервалів оновлення часу відтворення
-
-// Функція для отримання тривалості відео за допомогою ffprobe - ВИДАЛЕНО
-
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "static", "index.html"));
@@ -319,6 +319,7 @@ io.on("connection", (socket) => {
     });
 });
 
+// Сервер тепер слухає на порті, наданому середовищем (Render), або 80 за замовчуванням
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
