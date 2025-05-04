@@ -873,8 +873,7 @@ h1,
     min-height: 540px;
 }
 .stream>video{
-    min-width: 100%;
-    min-height: 100%;
+    scale: 4;
 }
 #shared-video{
     position: relative;
