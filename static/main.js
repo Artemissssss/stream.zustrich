@@ -1,5 +1,6 @@
 console.log(op)
-const socket = io('');
+// Підключаємось до Socket.IO. Шлях '/' вказує на корінь вашого додатку.
+const socket = io('/');
     const main__chat__window = document.getElementById("main__chat_window");
     const videoGrids = document.getElementById("video-grids");
     const videoPin = document.getElementById("pinned");
@@ -25,11 +26,12 @@ const socket = io('');
     }
     toggleControls(op=="true");
     console.log(op=="true")
+    // Конфігурація PeerJS для роботи за проксі Render з HTTPS
     var peer = new Peer(undefined, {
-        host: window.location.hostname,
-        port: 80,
-        path: '/peerjs',
-        secure: window.location.protocol === 'https:',
+        host: window.location.hostname, // Використовуємо хост поточного вікна
+        // port: 80, // ВИДАЛЕНО: Не вказуємо порт явно, щоб використовувати стандартний порт (443 для HTTPS)
+        path: '/peerjs', // Шлях до PeerJS сервера на вашому сервері
+        secure: window.location.protocol === 'https:', // Встановлюємо secure на основі протоколу клієнта
         debug: 3
     });
     let myVideoStream;
