@@ -453,7 +453,7 @@ async function toggleScreenShare() {
             // Create new peer for screen sharing
             screenSharePeer = new Peer(undefined, {
                 host: window.location.hostname,
-                port: 80,
+                // port: 80,
                 path: '/peerjs',
                 secure: window.location.protocol === 'https:',
                 debug: 3
