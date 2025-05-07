@@ -82,7 +82,9 @@ const playbackIntervals = {}; // Для зберігання інтервалі�
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "static", "index.html"));
 });
-
+app.get("/hello", (req, res) => {
+    res.sendStatus(200);
+});
 // Обробка POST запиту для завантаження відео і створення кімнати
 app.post("/join", upload.single('videoFile'), async (req, res) => {
     try {
